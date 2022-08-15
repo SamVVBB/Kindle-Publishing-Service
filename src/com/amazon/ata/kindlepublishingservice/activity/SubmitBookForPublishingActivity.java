@@ -27,6 +27,7 @@ public class SubmitBookForPublishingActivity {
 
     private PublishingStatusDao publishingStatusDao;
     private CatalogDao catalogDao;
+    private BookPublishRequestManager bookPublishRequestManager;
 
     /**
      * Instantiates a new SubmitBookForPublishingActivity object.
@@ -34,9 +35,10 @@ public class SubmitBookForPublishingActivity {
      * @param publishingStatusDao PublishingStatusDao to access the publishing status table.
      */
     @Inject
-    public SubmitBookForPublishingActivity(PublishingStatusDao publishingStatusDao, CatalogDao catalogDao) {
+    public SubmitBookForPublishingActivity(PublishingStatusDao publishingStatusDao, CatalogDao catalogDao, BookPublishRequestManager bookPublishRequestManager) {
         this.publishingStatusDao = publishingStatusDao;
         this.catalogDao = catalogDao;
+        this.bookPublishRequestManager = bookPublishRequestManager;
     }
 
     /**
@@ -57,7 +59,6 @@ public class SubmitBookForPublishingActivity {
         }
 
         // TODONE: Submit the BookPublishRequest for processing
-        BookPublishRequestManager bookPublishRequestManager = new BookPublishRequestManager();
         bookPublishRequestManager.addBookPublishRequest(bookPublishRequest);
 
 
