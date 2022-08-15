@@ -126,4 +126,26 @@ public class CatalogDaoTest {
         assertEquals(bookId, queriedItem.getBookId(), "Expected query to look for provided bookId");
         assertEquals(1, requestCaptor.getValue().getLimit(), "Expected query to have a limit set");
     }
+
+//    @Test
+//    public void softDeleteBookFromCatalog_InactiveTrue_returnsTrue() {
+//        // GIVEN
+//        String bookId = "book.123";
+//        CatalogItemVersion item = new CatalogItemVersion();
+//        item.setInactive(false);
+//        item.setBookId(bookId);
+//        item.setVersion(2);
+//
+//
+//        when(dynamoDbMapper.query(eq(CatalogItemVersion.class), any(DynamoDBQueryExpression.class))).thenReturn(list);
+//        when(list.isEmpty()).thenReturn(false);
+//        when(list.get(0)).thenReturn(item);
+//
+//        // WHEN
+//        CatalogItemVersion book = catalogDao.softDeleteBookFromCatalog(bookId);
+//
+//        assertEquals(bookId, book.getBookId());
+//        assertEquals(2, book.getVersion(), "Expected version 2 to be returned");
+//        assertEquals(book.isInactive(), "Expected book to be inactive");
+//    }
 }

@@ -1,11 +1,14 @@
 package com.amazon.ata.kindlepublishingservice.dao;
 
+import com.amazon.ata.kindlepublishingservice.activity.RemoveBookFromCatalogActivity;
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
+import com.amazon.ata.kindlepublishingservice.models.requests.RemoveBookFromCatalogRequest;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,4 +61,27 @@ public class CatalogDao {
         }
         return results.get(0);
     }
+
+    public CatalogItemVersion softDeleteBookFromCatalog(String bookId) {
+
+        // Instantiate a CatalogItemVersion object to interact with DynamoDB
+//        CatalogItemVersion catalogItemVersion = dynamoDbMapper.load(CatalogItemVersion.class, bookId);
+
+        CatalogItemVersion catalogItemVersion = this.getLatestVersionOfBook(bookId);
+
+        if (catalogItemVersion == null || catalogItemVersion.isInactive()) {
+            throw new BookNotFoundException(String.format("No book found for id: %s", bookId));
+        }
+
+        // Set the bookId in the object to bookId to be softDeleted
+//        catalogItemVersion.setBookId(bookId);
+        // And set Inactive to TRUE. This performs the soft delete
+        catalogItemVersion.setInactive(true);
+
+        // Save the updated book in DynamoDB
+        dynamoDbMapper.save(catalogItemVersion);
+
+        return catalogItemVersion;
+    }
+
 }
