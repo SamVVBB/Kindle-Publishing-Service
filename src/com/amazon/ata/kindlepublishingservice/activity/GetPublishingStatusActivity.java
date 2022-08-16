@@ -14,7 +14,6 @@ import java.util.List;
 public class GetPublishingStatusActivity {
 
     private PublishingStatusDao publishingStatusDao;
-    private PublishingStatusItemConverter publishingStatusItemConverter;
 
     @Inject
     public GetPublishingStatusActivity(PublishingStatusDao publishingStatusDao) {
@@ -27,7 +26,7 @@ public class GetPublishingStatusActivity {
                 publishingStatusDao.getPublishingStatus(publishingStatusRequest.getPublishingRecordId());
 
         return GetPublishingStatusResponse.builder()
-                .withPublishingStatusHistory(publishingStatusItemConverter.toRecord(publishingStatusItems))
+                .withPublishingStatusHistory(PublishingStatusItemConverter.toRecord(publishingStatusItems))
                 .build();
     }
 }
