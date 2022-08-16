@@ -1,15 +1,24 @@
 package com.amazon.ata.kindlepublishingservice.dao;
 
+import com.amazon.ata.aws.dynamodb.DynamoDbClientProvider;
+import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.PublishingStatusItem;
 import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
+import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 import com.amazon.ata.kindlepublishingservice.exceptions.PublishingStatusNotFoundException;
+import com.amazon.ata.kindlepublishingservice.models.PublishingStatusRecord;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import javax.inject.Inject;
 
 /**
@@ -77,4 +86,25 @@ public class PublishingStatusDao {
         dynamoDbMapper.save(item);
         return item;
     }
+
+    public List<PublishingStatusItem> getPublishingStatus(String publishingStatusId) {
+
+        Map<String, AttributeValue> valueMap = new HashMap<>();
+        valueMap.put(":publishingRecordId", new AttributeValue().withS(publishingStatusId));
+
+        DynamoDBQueryExpression<PublishingStatusItem> queryExpression = new DynamoDBQueryExpression<PublishingStatusItem>()
+                .withKeyConditionExpression("publishingRecordId = :publishingRecordId")
+                .withExpressionAttributeValues(valueMap);
+
+        QueryResultPage<PublishingStatusItem> PublishingStatusItemQueryResults =
+                dynamoDbMapper.queryPage(PublishingStatusItem.class, queryExpression);
+        List<PublishingStatusItem> PublishingStatusItems = PublishingStatusItemQueryResults.getResults();
+
+        if (PublishingStatusItems.isEmpty()) {
+            throw new PublishingStatusNotFoundException(String.format("Nothing found for id: %s", publishingStatusId));
+        }
+
+        return PublishingStatusItems;
+    }
+
 }
