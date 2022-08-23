@@ -5,11 +5,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class BookPublishRequestManager {
 
-    ConcurrentLinkedQueue<BookPublishRequest> publishRequestQueue;
+    private ConcurrentLinkedQueue<BookPublishRequest> publishRequestQueue;
 
-    @Inject
+
     public BookPublishRequestManager(ConcurrentLinkedQueue<BookPublishRequest> publishRequestQueue) {
         this.publishRequestQueue = publishRequestQueue;
+    }
+
+    public BookPublishRequestManager() {
+        publishRequestQueue = new ConcurrentLinkedQueue<>();
     }
 
     public void addBookPublishRequest(BookPublishRequest bookPublishRequest) {

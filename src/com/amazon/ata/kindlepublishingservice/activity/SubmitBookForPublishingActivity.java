@@ -61,7 +61,6 @@ public class SubmitBookForPublishingActivity {
         // TODONE: Submit the BookPublishRequest for processing
         bookPublishRequestManager.addBookPublishRequest(bookPublishRequest);
 
-
         PublishingStatusItem item =  publishingStatusDao.setPublishingStatus(bookPublishRequest.getPublishingRecordId(),
                 PublishingRecordStatus.QUEUED,
                 bookPublishRequest.getBookId());

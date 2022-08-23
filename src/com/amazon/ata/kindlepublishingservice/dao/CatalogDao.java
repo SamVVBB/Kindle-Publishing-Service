@@ -3,6 +3,7 @@ package com.amazon.ata.kindlepublishingservice.dao;
 import com.amazon.ata.kindlepublishingservice.activity.RemoveBookFromCatalogActivity;
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
+import com.amazon.ata.kindlepublishingservice.models.Book;
 import com.amazon.ata.kindlepublishingservice.models.requests.RemoveBookFromCatalogRequest;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
@@ -10,6 +11,7 @@ import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.xspec.B;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -93,6 +95,51 @@ public class CatalogDao {
         if (catalogItemVersion == null) {
             throw new BookNotFoundException(String.format("could not find book with id: %s", bookId));
         }
+
+    }
+
+    public CatalogItemVersion createOrUpdateBook(KindleFormattedBook kindleFormattedBook) {
+
+//        CatalogItemVersion item = getLatestVersionOfBook(kindleFormattedBook.getBookId());
+//
+//        if (item == null) {
+//            item.setBookId(KindlePublishingUtils.generateBookId());
+//            item.setAuthor(kindleFormattedBook.getAuthor());
+//            item.setGenre(kindleFormattedBook.getGenre());
+//            item.setText(kindleFormattedBook.getText());
+//            item.setTitle(kindleFormattedBook.getTitle());
+//            item.setVersion(1);
+//            dynamoDbMapper.save(item);
+//            return item;
+//        }
+//
+//        this.validateBookExists(item.getBookId());
+//
+//        return this.getLatestVersionOfBook(item.getBookId());
+
+        String bookId = kindleFormattedBook.getBookId();
+        CatalogItemVersion newItem = new CatalogItemVersion();
+        newItem.setInactive(false);
+        newItem.setAuthor( kindleFormattedBook.getAuthor() );
+        newItem.setGenre(  kindleFormattedBook.getGenre()  );
+        newItem.setText(   kindleFormattedBook.getText()   );
+        newItem.setTitle(  kindleFormattedBook.getTitle()  );
+
+        if (bookId == null) {
+            newItem.setVersion(1);
+            newItem.setBookId(KindlePublishingUtils.generateBookId());
+            dynamoDbMapper.save(newItem);
+        } else {
+            validateBookExists(bookId);
+            CatalogItemVersion exisingItem = getLatestVersionOfBook(bookId);
+
+            newItem.setBookId(  bookId );
+            newItem.setVersion( exisingItem.getVersion() + 1 );
+
+            softDeleteBookFromCatalog(exisingItem.getBookId());
+            dynamoDbMapper.save(newItem);
+        }
+        return newItem;
 
     }
 
